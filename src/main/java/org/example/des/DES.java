@@ -2,14 +2,16 @@ package org.example.des;
 
 public class DES {
 
-    //Hard-coded shift, pBlock and sBox used for both encryption and decryption
+    // Hard-coded shift table for key scheduling (16 rounds, 1 or 2 bit shifts)
     static final int[] keyShifts = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
+    // P-box permutation table (32 bits to 32 bits) used in the round function
     static final int[] pBlock = {
             16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
             2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25
     };
 
+    // S-box substitution tables (8 S-boxes, each mapping 6 bits to 4 bits)
     static final byte[] sBox = {
                     // S1
                     14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,
@@ -53,6 +55,7 @@ public class DES {
                     2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
     };
 
+    // Initial permutation table (64 bits to 64 bits)
     static final int[] initialPermutation = {
             58, 50, 42, 34, 26, 18, 10, 2,
             60, 52, 44, 36, 28, 20, 12, 4,
@@ -64,6 +67,7 @@ public class DES {
             63, 55, 47, 39, 31, 23, 15, 7
     };
 
+    // Final permutation table (64 bits to 64 bits, inverse of IP)
     static final int[] finalPermutation = {
             40, 8, 48, 16, 56, 24, 64, 32,
             39, 7, 47, 15, 55, 23, 63, 31,
@@ -75,6 +79,7 @@ public class DES {
             33, 1, 41, 9, 49, 17, 57, 25
     };
 
+    // Compression permutation table (56 bits to 48 bits) for sub key generation
     static final int[] compressionPermutation =
             {
                     14,	17,	11,	24,	1,	5,	3,	28,
@@ -85,6 +90,7 @@ public class DES {
                     34,	53,	46,	42,	50,	36,	29,	32
             };
 
+    // Parity drop permutation table (64 bits to 56 bits) for key scheduling
     static final int[] parityDropPermutation =
             {
                     57,	49,	41,	33,	25,	17,	9,	1,
@@ -96,6 +102,7 @@ public class DES {
                     29,	21,	13,	5,	28,	20,	12,	4
             };
 
+    // Expansion table (32 bits to 48 bits) used in the round function
     static final int[] expansionTable = {
             32,  1,  2,  3,  4,  5,
             4,  5,  6,  7,  8,  9,
@@ -107,90 +114,98 @@ public class DES {
             28, 29, 30, 31, 32,  1
     };
 
-    private long key;
-    private long[] subKeys;
+    private long key;                    // 64-bit encryption key
+    private long[] subKeys;              // Array of 16 48-bit sub keys
 
+    // Constructor initializing DES with a 64-bit key
     public DES (long key) {
         this.key = key;
         this.subKeys = generateSubKeys(key);
     }
 
+    // Generate 16 sub keys from the 64-bit key
     private long[] generateSubKeys (long key) {
         long[] subKeys = new long[16];
-        long permutedKey = permute(key, parityDropPermutation, 64, 56);
-        int left = (int) (permutedKey >>> 28);
-        int right = (int) (permutedKey & 0xFFFFFFF);
+        long permutedKey = permute(key, parityDropPermutation, 64, 56); // Apply parity drop (64 to 56 bits)
+        int left = (int) (permutedKey >>> 28); // Left half (28 bits)
+        int right = (int) (permutedKey & 0xFFFFFFF); // Right half (28 bits)
 
         for (int i = 0; i < 16; i++) {
-            left = rotateLeft(left, keyShifts[i], 28);
-            right = rotateLeft(right, keyShifts[i], 28);
-            long combined = ((long) left << 28) | right;
-            subKeys[i] = permute(combined, compressionPermutation, 56, 48);
+            left = rotateLeft(left, keyShifts[i], 28); // Rotate left half
+            right = rotateLeft(right, keyShifts[i], 28); // Rotate right half
+            long combined = ((long) left << 28) | right; // Combine halves (56 bits)
+            subKeys[i] = permute(combined, compressionPermutation, 56, 48); // Apply compression (56 to 48 bits)
         }
         return subKeys;
     }
 
+    // Perform a left circular shift on a value with a specified size
     private int rotateLeft(int value, int shift, int size) {
         return ((value << shift) | (value >>> (size - shift))) & ((1 << size) - 1);
     }
 
+    // Permute bits of input using a given table
     private long permute (long input, int[] table, int inputSize, int outputSize) {
     long result = 0;
     for (int i = 0; i < outputSize; i++) {
-        int bitPos = inputSize - table[i];
-        if ((input & (1L << bitPos)) != 0) {
-            result |= (1L << (outputSize - 1 - i));
+        int bitPos = inputSize - table[i]; // Calculate bit position
+        if ((input & (1L << bitPos)) != 0) { // Check if bit is set
+            result |= (1L << (outputSize - 1 - i)); // Set corresponding bit in result
         }
     }
         return result;
     }
 
+    // Round function - transforming the right half using a sub key
     private int roundFunction(int right, long subKey) {
-        long expanded = permute(right, expansionTable, 32, 48);
-        long xorResult = expanded ^ subKey;
+        long expanded = permute(right, expansionTable, 32, 48); // Expand 32 bits to 48 bits
+        long xorResult = expanded ^ subKey; // XOR with sub key
         int result = 0;
 
+        // Process through 8 S-boxes (6 bits to 4 bits each)
         for (int i = 0; i < 8; i++) {
-            int block = (int) ((xorResult >>> (42 - 6 * i)) & 0x3F);
-            int row = ((block & 0x20) >>> 4) | (block & 0x01);
-            int col = (block >>> 1) & 0x0F;
-            int sValue = sBox[i * 64 + row * 16 + col];
-            result |= sValue << (28 - 4 * i);
+            int block = (int) ((xorResult >>> (42 - 6 * i)) & 0x3F); // Extract 6-bit block
+            int row = ((block & 0x20) >>> 4) | (block & 0x01);       // Row (bits 1 and 6)
+            int col = (block >>> 1) & 0x0F;                          // Column (bits 2-5)
+            int sValue = sBox[i * 64 + row * 16 + col];              // S-box lookup
+            result |= sValue << (28 - 4 * i);                        // Combine 4-bit output
         }
-        return (int) permute(result, pBlock, 32, 32);
+        return (int) permute(result, pBlock, 32, 32); // Apply pBlock permutation
     }
 
     // Encrypting 64-bit block
     public long encryptBlock(long block) {
-        long permuted = permute(block, initialPermutation, 64, 64); // IP
-        int left = (int) (permuted >>> 32);
-        int right = (int) (permuted & 0xFFFFFFFFL);
+        long permuted = permute(block, initialPermutation, 64, 64); // Apply IP
+        int left = (int) (permuted >>> 32);          // Left half (32 bits)
+        int right = (int) (permuted & 0xFFFFFFFFL);  // Right half (32 bits)
 
+        // Perform 16 rounds
         for (int i = 0; i < 16; i++) {
             int temp = left;
-            left = right;
-            right = temp ^ roundFunction(right, subKeys[i]);
+            left = right;                                        // L(i+1) = R(i)
+            right = temp ^ roundFunction(right, subKeys[i]);     // R(i+1) = L(i) XOR f(R(i), K(i))
         }
 
-        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);
-        return permute(combined, finalPermutation, 64, 64); // IP⁻¹
+        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);    // Swap and combine halves
+        return permute(combined, finalPermutation, 64, 64); // Apply IP⁻¹
     }
 
     // Decrypting 64-bit block
     public long decryptBlock(long block) {
-        long permuted = permute(block, initialPermutation, 64, 64); // IP
-        int left = (int) (permuted >>> 32);
-        int right = (int) (permuted & 0xFFFFFFFFL);
+        long permuted = permute(block, initialPermutation, 64, 64); // Apply IP
+        int left = (int) (permuted >>> 32);         // Left half (32 bits)
+        int right = (int) (permuted & 0xFFFFFFFFL); // Right half (32 bits)
 
+        // Perform 16 rounds in reverse order
         for (int i = 15; i >= 0; i--) {
             int temp = left;
-            left = right;
-            right = temp ^ roundFunction(right, subKeys[i]);
+            left = right;                                        // L(i+1) = R(i)
+            right = temp ^ roundFunction(right, subKeys[i]);     // R(i+1) = L(i) XOR f(R(i), K(i))
         }
 
         long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);
         return permute(combined, finalPermutation, 64, 64); // IP⁻¹
     }
 
-    // TODO: test the algorithm, add more comments
+    // TODO: test the algorithm
 }
