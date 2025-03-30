@@ -203,7 +203,7 @@ public class DES {
             right = temp ^ roundFunction(right, subKeys[i]);     // R(i+1) = L(i) XOR f(R(i), K(i))
         }
 
-        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);
+        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);    // Swap and combine halves
         return permute(combined, finalPermutation, 64, 64); // IP⁻¹
     }
 
