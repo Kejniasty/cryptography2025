@@ -108,4 +108,40 @@ public class DES {
     };
     //TODO: implement key shifts, and bit modifications consistent with DES algorithm
 
+    private long key;
+    private long[] subKeys;
+
+    public DES (long key) {
+        this.key = key;
+        this.subKeys = generateSubKeys(keys);
+    }
+
+    private long[] generateSubKeys (long key) {
+        long[] subKeys = new long[16];
+        long permutedKey = permute(key, parityDropPermutation, 64, 56);
+
+        for (int i = 0; i < 16; i++) {
+            left = rotateLeft(left, keyShifts[i], 28);
+            right = rotateLeft(right, keyShifts[i], 28);
+            long combined = ((long) left << 28) | right;
+            subKeys[i] = permute(combined, compressionPermutation, 56, 48);
+        }
+        return subKeys;
+    }
+
+    private int rotateLeft(int value, int shift, int size) {
+        return ((value << shift) | (value >>> (size - shift))) & ((1 << size) - 1);
+    }
+
+    private long permute (long input, int[] table, int inputSize, int outputSize) {
+    long result = 0;
+    for (int i = 0; i < outputSize; i++) {
+        int bitPos = inputSize - table[i];
+        if ((input & (1L << bitPos)) != 0) {
+            result |= (1L << (outsputSize - 1 - i));
+        }
+    }
+        return result;
+    }
+
 }
