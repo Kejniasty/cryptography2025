@@ -113,12 +113,14 @@ public class DES {
 
     public DES (long key) {
         this.key = key;
-        this.subKeys = generateSubKeys(keys);
+        this.subKeys = generateSubKeys(key);
     }
 
     private long[] generateSubKeys (long key) {
         long[] subKeys = new long[16];
         long permutedKey = permute(key, parityDropPermutation, 64, 56);
+        int left = (int) (permutedKey >>> 28);
+        int right = (int) (permutedKey & 0xFFFFFFF);
 
         for (int i = 0; i < 16; i++) {
             left = rotateLeft(left, keyShifts[i], 28);
@@ -138,7 +140,7 @@ public class DES {
     for (int i = 0; i < outputSize; i++) {
         int bitPos = inputSize - table[i];
         if ((input & (1L << bitPos)) != 0) {
-            result |= (1L << (outsputSize - 1 - i));
+            result |= (1L << (outputSize - 1 - i));
         }
     }
         return result;
