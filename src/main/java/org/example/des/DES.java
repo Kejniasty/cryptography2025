@@ -106,7 +106,6 @@ public class DES {
             24, 25, 26, 27, 28, 29,
             28, 29, 30, 31, 32,  1
     };
-    //TODO: implement key shifts, and bit modifications consistent with DES algorithm
 
     private long key;
     private long[] subKeys;
@@ -146,4 +145,52 @@ public class DES {
         return result;
     }
 
+    private int roundFunction(int right, long subKey) {
+        long expanded = permute(right, expansionTable, 32, 48);
+        long xorResult = expanded ^ subKey;
+        int result = 0;
+
+        for (int i = 0; i < 8; i++) {
+            int block = (int) ((xorResult >>> (42 - 6 * i)) & 0x3F);
+            int row = ((block & 0x20) >>> 4) | (block & 0x01);
+            int col = (block >>> 1) & 0x0F;
+            int sValue = sBox[i * 64 + row * 16 + col];
+            result |= sValue << (28 - 4 * i);
+        }
+        return (int) permute(result, pBlock, 32, 32);
+    }
+
+    // Encrypting 64-bit block
+    public long encryptBlock(long block) {
+        long permuted = permute(block, initialPermutation, 64, 64); // IP
+        int left = (int) (permuted >>> 32);
+        int right = (int) (permuted & 0xFFFFFFFFL);
+
+        for (int i = 0; i < 16; i++) {
+            int temp = left;
+            left = right;
+            right = temp ^ roundFunction(right, subKeys[i]);
+        }
+
+        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);
+        return permute(combined, finalPermutation, 64, 64); // IP⁻¹
+    }
+
+    // Decrypting 64-bit block
+    public long decryptBlock(long block) {
+        long permuted = permute(block, initialPermutation, 64, 64); // IP
+        int left = (int) (permuted >>> 32);
+        int right = (int) (permuted & 0xFFFFFFFFL);
+
+        for (int i = 15; i >= 0; i--) {
+            int temp = left;
+            left = right;
+            right = temp ^ roundFunction(right, subKeys[i]);
+        }
+
+        long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);
+        return permute(combined, finalPermutation, 64, 64); // IP⁻¹
+    }
+
+    // TODO: test the algorithm, add more comments
 }
