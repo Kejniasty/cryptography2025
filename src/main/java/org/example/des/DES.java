@@ -3,7 +3,7 @@ package org.example.des;
 public class DES {
 
     //Hard-coded shift, pBlock and sBox used for both encryption and decryption
-    byte[] shift = {1, 3, 5, 7, 0, 2, 4, 6};
+    final byte[] shift = {1, 3, 5, 7, 0, 2, 4, 6};
     final byte[] pBlock = {
             16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
             2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25
@@ -43,7 +43,7 @@ public class DES {
                     2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
     };
 
-    final byte[] initialPermutation = {
+    static final int[] initialPermutation = {
             58, 50, 42, 34, 26, 18, 10, 2,
             60, 52, 44, 36, 28, 20, 12, 4,
             62, 54, 46, 38, 30, 22, 14, 6,
@@ -54,7 +54,7 @@ public class DES {
             63, 55, 47, 39, 31, 23, 15, 7
     };
 
-    final byte[] finalPermutation = {
+    static final int[] finalPermutation = {
             40, 8, 48, 16, 56, 24, 64, 32,
             39, 7, 47, 15, 55, 23, 63, 31,
             38, 6, 46, 14, 54, 22, 62, 30,
@@ -86,7 +86,7 @@ public class DES {
                     29,	21,	13,	5,	28,	20,	12,	4
             };
 
-    final byte[] expansionTable = {
+    static final int[] expansionTable = {
             32,  1,  2,  3,  4,  5,
             4,  5,  6,  7,  8,  9,
             8,  9, 10, 11, 12, 13,
