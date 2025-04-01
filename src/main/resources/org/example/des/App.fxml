@@ -4,54 +4,62 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="366.0" prefWidth="657.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.AppController">
+<VBox alignment="CENTER" prefHeight="350.0" prefWidth="657.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.AppController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
     <Label fx:id="welcomeText" />
-   <HBox prefHeight="158.0" prefWidth="618.0">
+   <Label prefHeight="22.0" prefWidth="202.0" text="Wybierz jak chcesz szyfrować " textAlignment="CENTER">
+      <font>
+         <Font size="15.0" />
+      </font>
+   </Label>
+   <HBox alignment="CENTER" prefHeight="43.0" prefWidth="342.0">
       <children>
-         <GridPane alignment="CENTER" prefHeight="168.0" prefWidth="618.0">
-            <columnConstraints>
-               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            </columnConstraints>
-            <rowConstraints>
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <children>
-               <TextField prefHeight="26.0" prefWidth="242.0" />
-               <TextField GridPane.columnIndex="1" />
-               <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="314.0" text="Generuj podklucze" GridPane.rowIndex="1" />
-               <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="334.0" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            </children>
-         </GridPane>
-      </children></HBox>
-   <GridPane alignment="CENTER" prefHeight="160.0" prefWidth="443.0">
-     <columnConstraints>
-       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-     </columnConstraints>
-     <rowConstraints>
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-     </rowConstraints>
-      <children>
-          <Button alignment="CENTER" contentDisplay="CENTER" onAction="#onHelloButtonClick" prefHeight="26.0" prefWidth="88.0" text="Otwórz" />
-         <Button contentDisplay="TOP" mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Szyfruj" GridPane.columnIndex="1" />
-         <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Deszyfruj" GridPane.rowIndex="1" />
-         <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Zamknij" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <effect>
-               <Glow />
-            </effect>
-         </Button>
-         <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-         <TextField GridPane.rowIndex="2" />
+         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="81.0" text="W okienku" textAlignment="CENTER" />
+         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="96.0" text="Z pliku" textAlignment="CENTER" />
       </children>
-   </GridPane>
+   </HBox>
+    <HBox prefHeight="158.0" prefWidth="618.0">
+        <GridPane alignment="CENTER" prefHeight="168.0" prefWidth="618.0">
+           <columnConstraints>
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+           </columnConstraints>
+           <rowConstraints>
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+           </rowConstraints>
+           <children>
+               <TextField prefHeight="26.0" prefWidth="133.0" />
+               <TextField prefHeight="26.0" prefWidth="330.0" GridPane.columnIndex="2" />
+               <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="334.0" text="Generuj podklucze" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField GridPane.columnIndex="1" />
+           </children>
+        </GridPane>
+    </HBox>
+    <GridPane alignment="CENTER" prefHeight="160.0" prefWidth="443.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <Button alignment="CENTER" contentDisplay="CENTER" onAction="#onHelloButtonClick" prefHeight="26.0" prefWidth="88.0" text="Otwórz" />
+        <Button contentDisplay="TOP" mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Szyfruj" GridPane.columnIndex="1" />
+        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Deszyfruj" GridPane.rowIndex="1" />
+        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Zamknij" GridPane.columnIndex="1" GridPane.rowIndex="1">
+           <effect>
+               <Glow />
+           </effect>
+        </Button>
+    </GridPane>
 </VBox>

@@ -27,5 +27,4 @@ public class tripleDES {
         long step3 = des3.decryptBlock(step2);  // Step 3: Decrypt with K3
         return step3;                           // Return the decrypted block
     }
-    // TODO: test the algorithm
 }

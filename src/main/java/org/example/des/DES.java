@@ -206,6 +206,4 @@ public class DES {
         long combined = ((long) right << 32) | (left & 0xFFFFFFFFL);    // Swap and combine halves
         return permute(combined, finalPermutation, 64, 64); // IP⁻¹
     }
-
-    // TODO: test the algorithm
 }
