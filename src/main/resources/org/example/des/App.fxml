@@ -2,64 +2,133 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="350.0" prefWidth="657.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.AppController">
+<VBox alignment="CENTER" prefHeight="508.0" prefWidth="580.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.AppController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label fx:id="welcomeText" />
-   <Label prefHeight="22.0" prefWidth="202.0" text="Wybierz jak chcesz szyfrować " textAlignment="CENTER">
-      <font>
-         <Font size="15.0" />
-      </font>
-   </Label>
-   <HBox alignment="CENTER" prefHeight="43.0" prefWidth="342.0">
-      <children>
-         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="81.0" text="W okienku" textAlignment="CENTER" />
-         <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="96.0" text="Z pliku" textAlignment="CENTER" />
-      </children>
-   </HBox>
-    <HBox prefHeight="158.0" prefWidth="618.0">
-        <GridPane alignment="CENTER" prefHeight="168.0" prefWidth="618.0">
-           <columnConstraints>
-               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-           </columnConstraints>
-           <rowConstraints>
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-           </rowConstraints>
-           <children>
-               <TextField prefHeight="26.0" prefWidth="133.0" />
-               <TextField prefHeight="26.0" prefWidth="330.0" GridPane.columnIndex="2" />
-               <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="334.0" text="Generuj podklucze" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" />
-           </children>
-        </GridPane>
-    </HBox>
-    <GridPane alignment="CENTER" prefHeight="160.0" prefWidth="443.0">
+    <!-- Key input and subkey generation section -->
+    <GridPane alignment="CENTER" hgap="10.0" prefHeight="127.0" prefWidth="618.0" vgap="10.0">
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="177.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.0" minWidth="10.0" prefWidth="194.6" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="192.59999999999997" />
+         <ColumnConstraints maxWidth="73.0" minWidth="0.0" prefWidth="0.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints maxHeight="27.4" minHeight="10.0" prefHeight="13.399999999999999" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="54.2" minHeight="10.0" prefHeight="28.39999999999999" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="34.8" minHeight="0.0" prefHeight="24.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <!-- Labels for keys -->
+        <Label text="Klucz 1:" GridPane.rowIndex="0" />
+        <Label text="Klucz 2:" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label text="Klucz 3:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <!-- Key display fields -->
+        <TextField fx:id="key1Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="key2Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="key3Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <Button fx:id="generateKeysButton" onAction="#generateKeys" prefHeight="26.0" prefWidth="150.0" text="Generuj klucze" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+    </GridPane>
+    <GridPane alignment="CENTER" hgap="10.0" layoutX="30.0" layoutY="177.0" prefHeight="55.0" prefWidth="618.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
         </columnConstraints>
         <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <TextField fx:id="loadKeysField" promptText="Wczytaj klucze z pliku" GridPane.columnIndex="0" />
+        <Button fx:id="loadKeysButton" onAction="#loadKeys" prefHeight="26.0" prefWidth="80.0" text="Wczytaj" GridPane.columnIndex="1" />
+        <TextField fx:id="saveKeysField" promptText="Zapisz klucze do pliku" GridPane.columnIndex="2" />
+        <Button fx:id="saveKeysButton" onAction="#saveKeys" prefHeight="26.0" prefWidth="80.0" text="Zapisz" GridPane.columnIndex="3" />
+    </GridPane>
+
+    <!-- File operations section -->
+    <GridPane alignment="CENTER" hgap="10.0" prefHeight="55.0" prefWidth="618.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+        </columnConstraints>
+        <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
-        <Button alignment="CENTER" contentDisplay="CENTER" onAction="#onHelloButtonClick" prefHeight="26.0" prefWidth="88.0" text="Otwórz" />
-        <Button contentDisplay="TOP" mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Szyfruj" GridPane.columnIndex="1" />
-        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="89.0" text="Deszyfruj" GridPane.rowIndex="1" />
-        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Zamknij" GridPane.columnIndex="1" GridPane.rowIndex="1">
-           <effect>
-               <Glow />
-           </effect>
-        </Button>
+        <TextField fx:id="loadPlaintextField" promptText="Otwórz plik z tekstem jawnym" GridPane.columnIndex="0" />
+        <Button fx:id="loadPlaintextButton" onAction="#loadPlaintext" prefHeight="26.0" prefWidth="80.0" text="Otwórz" GridPane.columnIndex="1" />
+        <TextField fx:id="loadCiphertextField" promptText="Otwórz plik z szyfrogramem" GridPane.columnIndex="2" />
+        <Button fx:id="loadCiphertextButton" onAction="#loadCiphertext" prefHeight="26.0" prefWidth="80.0" text="Otwórz" GridPane.columnIndex="3" />
+    </GridPane>
+    <VBox prefHeight="217.0" prefWidth="628.0"><!-- Encryption/Decryption section -->
+        <HBox alignment="CENTER" prefHeight="156.0" prefWidth="618.0">
+            <TextArea fx:id="plaintextArea" prefHeight="126.0" prefWidth="200.0" promptText="Tu podaj tekst jawny"
+                      wrapText="true"/>
+            <GridPane prefHeight="156.0" prefWidth="223.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints maxHeight="24.4" minHeight="10.0" prefHeight="15.399999999999999"
+                                    vgrow="SOMETIMES"/>
+                    <RowConstraints maxHeight="29.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES"/>
+                    <RowConstraints maxHeight="44.39999999999999" minHeight="10.0" prefHeight="41.39999999999999"
+                                    vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Button fx:id="encryptButton" onAction="#encrypt" prefHeight="44.0" prefWidth="100.0"
+                        text="Szyfruj ---&gt;" GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <Button fx:id="decryptButton" onAction="#decrypt" prefHeight="26.0" prefWidth="100.0"
+                        text="&lt;--- Deszyfruj" GridPane.halignment="CENTER" GridPane.rowIndex="2"/>
+                <RadioButton fx:id="fileRadio" mnemonicParsing="false" prefHeight="18.0" prefWidth="62.0" text="Plik"
+                             GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="modeGroup"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="windowRadio" mnemonicParsing="false" prefHeight="18.0" prefWidth="62.0" text="Okno"
+                             toggleGroup="$modeGroup" GridPane.halignment="CENTER" GridPane.rowIndex="4"/>
+            </GridPane>
+            <TextArea fx:id="ciphertextArea" prefHeight="126.0" prefWidth="200.0" promptText="Tu podaj szyfrogram"
+                      wrapText="true"/>
+        </HBox>
+        <GridPane prefHeight="53.0" prefWidth="618.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" maxWidth="360.0" minWidth="10.0" prefWidth="196.6"/>
+                <ColumnConstraints hgrow="NEVER" maxWidth="360.0" minWidth="10.0" prefWidth="227.79999999999998"/>
+                <ColumnConstraints hgrow="NEVER" maxWidth="303.0" minWidth="10.0" prefWidth="195.8"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Button maxHeight="26.0" maxWidth="189.0" mnemonicParsing="false" onAction="#clearPlainTextArea"
+                    prefHeight="26.0" prefWidth="189.0" text="Wyczyść pole z tekstem jawnym"
+                    GridPane.halignment="CENTER"/>
+            <Button maxHeight="26.0" maxWidth="189.0" mnemonicParsing="false" onAction="#clearCipherTextAreas"
+                    prefHeight="26.0" prefWidth="188.0" text="Wyczyść pole z szyfrogramem" GridPane.columnIndex="2"
+                    GridPane.halignment="CENTER"/>
+        </GridPane>
+    </VBox>
+
+    <!-- Save file section -->
+    <GridPane alignment="CENTER" hgap="10.0" prefHeight="54.0" prefWidth="618.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <TextField fx:id="savePlaintextField" promptText="Zapisz plik z tekstem jawnym" GridPane.columnIndex="0" />
+        <Button fx:id="savePlaintextButton" onAction="#savePlaintext" prefHeight="26.0" prefWidth="80.0" text="Zapisz" GridPane.columnIndex="1" />
+        <TextField fx:id="saveCiphertextField" promptText="Zapisz plik z szyfrogramem" GridPane.columnIndex="2" />
+        <Button fx:id="saveCiphertextButton" onAction="#saveCiphertext" prefHeight="26.0" prefWidth="80.0" text="Zapisz" GridPane.columnIndex="3" />
     </GridPane>
 </VBox>
