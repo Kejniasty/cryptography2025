@@ -128,6 +128,12 @@ public class AppController {
 
     @FXML
     private void loadPlaintext() {
+
+        if (windowRadio.isSelected()) {
+            showAlert("Informacja", "Wybrałeś tryb okna! W trybie okna nie możesz wczytywać plików.");
+            return;
+        }
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Otwórz plik z tekstem jawnym");
         File file = fileChooser.showOpenDialog(new Stage());
@@ -144,6 +150,12 @@ public class AppController {
 
     @FXML
     private void loadCiphertext() {
+
+        if (windowRadio.isSelected()) {
+            showAlert("Informacja", "Wybrałeś tryb okna! W trybie okna nie możesz wczytywać plików.");
+            return;
+        }
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Otwórz plik z szyfrogramem");
         File file = fileChooser.showOpenDialog(new Stage());
@@ -170,14 +182,13 @@ public class AppController {
             byte[] input;
             if (fileRadio.isSelected()) {
                 if (plaintextBytes == null || plaintextBytes.length == 0) {
-                    showAlert("Błąd", "Najpierw wczytaj plik z tekstem jawnym!");
+                    showAlert("Błąd", "Wybrałeś szyfrowanie z pliku! Najpierw wczytaj plik z tekstem jawnym.");
                     return;
                 }
                 input = plaintextBytes;
             } else {
                 input = plaintextArea.getText().getBytes();
             }
-
             // Pad input to be a multiple of 8 bytes
             input = padInput(input);
             byte[] output = new byte[input.length];
@@ -205,11 +216,11 @@ public class AppController {
 
             byte[] input;
             if (fileRadio.isSelected()) {
-                if (ciphertextBytes == null || ciphertextBytes.length == 0) {
-                    showAlert("Błąd", "Najpierw wczytaj plik z szyfrogramem!");
+                if (plaintextBytes == null || plaintextBytes.length == 0) {
+                    showAlert("Błąd", "Wybrałeś deszyfrowanie z pliku! Najpierw wczytaj plik z szyfrogramem.");
                     return;
                 }
-                input = ciphertextBytes;
+                input = plaintextBytes;
             } else {
                 input = hexToBytes(ciphertextArea.getText());
             }
