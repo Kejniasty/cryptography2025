@@ -30,57 +30,36 @@ public class AppController {
 
     @FXML
     private void initialize() {
-        // Initialize radio buttons (default to "Okno")
         windowRadio.setSelected(true);
     }
 
     @FXML
     private void generateKeys() {
-        // Use SecureRandom to generate random keys
         SecureRandom random = new SecureRandom();
-
-        // Generate three 64-bit keys
         long key1 = generateRandomKey(random);
         long key2 = generateRandomKey(random);
         long key3 = generateRandomKey(random);
-        // Display the keys in hex format
         key1Field.setText(String.format("%016X", key1));
         key2Field.setText(String.format("%016X", key2));
         key3Field.setText(String.format("%016X", key3));
     }
 
-    @FXML
-    // Helper method to generate a random 64-bit key with parity adjustment
     private long generateRandomKey(SecureRandom random) {
-        // Generate a random 64-bit key
         long key = random.nextLong();
-
-        // Adjust parity for each byte (DES keys typically have odd parity)
         key = adjustParity(key);
-
         return key;
     }
 
-    // Adjust parity of each byte in the 64-bit key to have an odd number of 1s
     private long adjustParity(long key) {
         long adjustedKey = 0;
         for (int i = 0; i < 8; i++) {
-            // Extract each byte (8 bits) from the 64-bit key
             byte b = (byte) ((key >>> (i * 8)) & 0xFF);
-
-            // Count the number of 1s in the first 7 bits
-            int bitCount = Integer.bitCount(b & 0xFE); // Ignore the least significant bit (parity bit)
-
-            // Set the parity bit (LSB) to ensure odd parity
+            int bitCount = Integer.bitCount(b & 0xFE);
             if (bitCount % 2 == 0) {
-                // If the number of 1s is even, set the parity bit to 1 to make it odd
                 b |= 0x01;
             } else {
-                // If the number of 1s is odd, set the parity bit to 0
                 b &= 0xFE;
             }
-
-            // Add the adjusted byte back to the key
             adjustedKey |= ((long) (b & 0xFF) << (i * 8));
         }
         return adjustedKey;
@@ -128,7 +107,6 @@ public class AppController {
 
     @FXML
     private void loadPlaintext() {
-
         if (windowRadio.isSelected()) {
             showAlert("Informacja", "Wybrałeś tryb okna! W trybie okna nie możesz wczytywać plików.");
             return;
@@ -140,7 +118,7 @@ public class AppController {
         if (file != null) {
             try {
                 plaintextBytes = Files.readAllBytes(file.toPath());
-                plaintextArea.setText(new String(plaintextBytes));
+                plaintextArea.setText("Wczytano plik: " + file.getName() + "\nRozmiar: " + plaintextBytes.length + " bajtów");
                 loadPlaintextField.setText(file.getAbsolutePath());
             } catch (IOException e) {
                 showAlert("Błąd", "Problem z wczytaniem pliku: " + e.getMessage());
@@ -150,7 +128,6 @@ public class AppController {
 
     @FXML
     private void loadCiphertext() {
-
         if (windowRadio.isSelected()) {
             showAlert("Informacja", "Wybrałeś tryb okna! W trybie okna nie możesz wczytywać plików.");
             return;
@@ -162,7 +139,7 @@ public class AppController {
         if (file != null) {
             try {
                 ciphertextBytes = Files.readAllBytes(file.toPath());
-                ciphertextArea.setText(bytesToHex(ciphertextBytes));
+                ciphertextArea.setText("Wczytano plik: " + file.getName() + "\nRozmiar: " + ciphertextBytes.length + " bajtów");
                 loadCiphertextField.setText(file.getAbsolutePath());
             } catch (IOException e) {
                 showAlert("Błąd", "Problem z wczytaniem pliku: " + e.getMessage());
@@ -173,7 +150,6 @@ public class AppController {
     @FXML
     private void encrypt() {
         try {
-            // Initialize TripleDES with the keys
             long key1 = Long.parseUnsignedLong(key1Field.getText(), 16);
             long key2 = Long.parseUnsignedLong(key2Field.getText(), 16);
             long key3 = Long.parseUnsignedLong(key3Field.getText(), 16);
@@ -187,19 +163,22 @@ public class AppController {
                 }
                 input = plaintextBytes;
             } else {
+                if (plaintextArea.getText().isEmpty()) {
+                    showAlert("Błąd", "W trybie okna musisz wpisać tekst jawny w polu tekstowym!");
+                    return;
+                }
                 input = plaintextArea.getText().getBytes();
             }
-            // Pad input to be a multiple of 8 bytes
+
             input = padInput(input);
             byte[] output = new byte[input.length];
-            // Encrypt in 8-byte blocks
             for (int i = 0; i < input.length; i += 8) {
                 long block = bytesToLong(input, i);
                 long encrypted = tripleDES.encryptBlock(block);
                 longToBytes(encrypted, output, i);
             }
             ciphertextBytes = output;
-            ciphertextArea.setText(bytesToHex(ciphertextBytes));
+            ciphertextArea.setText("Zaszyfrowano dane.\nRozmiar szyfrogramu: " + ciphertextBytes.length + " bajtów");
         } catch (NumberFormatException e) {
             showAlert("Błąd", "Nieprawidłowy format kluczy! Użyj wartości hex (np. 0123456789ABCDEF)");
         }
@@ -208,7 +187,6 @@ public class AppController {
     @FXML
     private void decrypt() {
         try {
-            // Initialize TripleDES with the keys
             long key1 = Long.parseUnsignedLong(key1Field.getText(), 16);
             long key2 = Long.parseUnsignedLong(key2Field.getText(), 16);
             long key3 = Long.parseUnsignedLong(key3Field.getText(), 16);
@@ -216,32 +194,42 @@ public class AppController {
 
             byte[] input;
             if (fileRadio.isSelected()) {
-                if (plaintextBytes == null || plaintextBytes.length == 0) {
+                if (ciphertextBytes == null || ciphertextBytes.length == 0) {
                     showAlert("Błąd", "Wybrałeś deszyfrowanie z pliku! Najpierw wczytaj plik z szyfrogramem.");
                     return;
                 }
-                input = plaintextBytes;
+                input = ciphertextBytes;
             } else {
-                input = hexToBytes(ciphertextArea.getText());
+                if (ciphertextArea.getText().isEmpty()) {
+                    showAlert("Błąd", "W trybie okna musisz wpisać szyfrogram w polu tekstowym!");
+                    return;
+                }
+                String hexText = ciphertextArea.getText();
+                if (hexText.contains("Szyfrogram (hex):")) {
+                    hexText = hexText.substring(hexText.indexOf("Szyfrogram (hex):\n") + "Szyfrogram (hex):\n".length()).trim();
+                }
+                input = hexToBytes(hexText);
             }
 
-            // Ensure input is a multiple of 8 bytes
             if (input.length % 8 != 0) {
                 showAlert("Błąd", "Szyfrogram musi mieć długość będącą wielokrotnością 8 bajtów!");
                 return;
             }
 
             byte[] output = new byte[input.length];
-            // Decrypt in 8-byte blocks
             for (int i = 0; i < input.length; i += 8) {
                 long block = bytesToLong(input, i);
                 long decrypted = tripleDES.decryptBlock(block);
                 longToBytes(decrypted, output, i);
             }
-            // Remove padding
             output = unpadOutput(output);
             plaintextBytes = output;
-            plaintextArea.setText(new String(plaintextBytes));
+
+            if (fileRadio.isSelected()) {
+                plaintextArea.setText("Odszyfrowano dane.\nRozmiar tekstu jawnego: " + plaintextBytes.length + " bajtów");
+            } else {
+                plaintextArea.setText(new String(plaintextBytes));
+            }
         } catch (NumberFormatException e) {
             showAlert("Błąd", "Nieprawidłowy format kluczy lub szyfrogramu! Użyj wartości hex.");
         }
@@ -272,10 +260,20 @@ public class AppController {
         File file = fileChooser.showSaveDialog(new Stage());
         if (file != null) {
             try {
-                if (ciphertextBytes == null) {
-                    ciphertextBytes = hexToBytes(ciphertextArea.getText());
+                if (fileRadio.isSelected()) {
+                    if (ciphertextBytes == null || ciphertextBytes.length == 0) {
+                        showAlert("Błąd", "Brak szyfrogramu do zapisania! Najpierw wczytaj lub zaszyfruj dane.");
+                        return;
+                    }
+                    Files.write(file.toPath(), ciphertextBytes);
+                } else {
+                    String hexText = ciphertextArea.getText();
+                    if (hexText.contains("Szyfrogram (hex):")) {
+                        hexText = hexText.substring(hexText.indexOf("Szyfrogram (hex):\n") + "Szyfrogram (hex):\n".length()).trim();
+                    }
+                    ciphertextBytes = hexToBytes(hexText);
+                    Files.write(file.toPath(), ciphertextBytes);
                 }
-                Files.write(file.toPath(), ciphertextBytes);
                 saveCiphertextField.setText(file.getAbsolutePath());
             } catch (NumberFormatException e) {
                 showAlert("Błąd", "Nieprawidłowy format szyfrogramu w oknie!");
@@ -285,7 +283,6 @@ public class AppController {
         }
     }
 
-    // Helper methods for encryption/decryption
     private long bytesToLong(byte[] bytes, int offset) {
         long result = 0;
         for (int i = 0; i < 8; i++) {
@@ -303,7 +300,7 @@ public class AppController {
 
     private byte[] padInput(byte[] input) {
         int paddingLength = 8 - (input.length % 8);
-        if (paddingLength == 8) paddingLength = 0; // No padding needed if already a multiple of 8
+        if (paddingLength == 8) paddingLength = 0;
         byte[] padded = new byte[input.length + paddingLength];
         System.arraycopy(input, 0, padded, 0, input.length);
         for (int i = input.length; i < padded.length; i++) {
@@ -314,7 +311,7 @@ public class AppController {
 
     private byte[] unpadOutput(byte[] input) {
         int paddingLength = input[input.length - 1] & 0xFF;
-        if (paddingLength > 8 || paddingLength == 0) return input; // No padding or invalid
+        if (paddingLength > 8 || paddingLength == 0) return input;
         return java.util.Arrays.copyOf(input, input.length - paddingLength);
     }
 
@@ -327,7 +324,7 @@ public class AppController {
     }
 
     private byte[] hexToBytes(String hex) {
-        hex = hex.replaceAll("\\s+", ""); // Remove spaces
+        hex = hex.replaceAll("\\s+", "");
         byte[] bytes = new byte[hex.length() / 2];
         for (int i = 0; i < hex.length(); i += 2) {
             bytes[i / 2] = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
@@ -346,14 +343,14 @@ public class AppController {
     @FXML
     private void clearPlainTextArea() {
         plaintextArea.clear();
-
         plaintextBytes = null;
+        loadPlaintextField.clear();
     }
 
     @FXML
     private void clearCipherTextAreas() {
         ciphertextArea.clear();
-
         ciphertextBytes = null;
+        loadCiphertextField.clear();
     }
 }
