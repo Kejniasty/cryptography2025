@@ -178,7 +178,12 @@ public class AppController {
                 longToBytes(encrypted, output, i);
             }
             ciphertextBytes = output;
-            ciphertextArea.setText("Zaszyfrowano dane.\nRozmiar szyfrogramu: " + ciphertextBytes.length + " bajtów");
+            if(fileRadio.isSelected()) {
+                ciphertextArea.setText("Zaszyfrowano dane.\nRozmiar szyfrogramu: " + ciphertextBytes.length + " bajtów");
+            }
+            else {
+                ciphertextArea.setText(bytesToHex(ciphertextBytes));
+            }
         } catch (NumberFormatException e) {
             showAlert("Błąd", "Nieprawidłowy format kluczy! Użyj wartości hex (np. 0123456789ABCDEF)");
         }
