@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="508.0" prefWidth="580.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.DesAppController">
+<VBox alignment="CENTER" prefHeight="508.0" prefWidth="580.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.ElGamalAppController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -15,7 +15,8 @@
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="177.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.0" minWidth="10.0" prefWidth="194.6" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="192.59999999999997" />
-         <ColumnConstraints maxWidth="73.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="192.59999999999997" /> <!-- Nowa kolumna dla MOD N -->
+            <ColumnConstraints maxWidth="73.0" minWidth="0.0" prefWidth="0.0" />
         </columnConstraints>
         <rowConstraints>
             <RowConstraints maxHeight="27.4" minHeight="10.0" prefHeight="13.399999999999999" vgrow="SOMETIMES" />
@@ -26,10 +27,12 @@
         <Label text="Klucz publiczny: g" GridPane.rowIndex="0" />
         <Label text="Klucz publiczny: h" GridPane.columnIndex="1" GridPane.rowIndex="0" />
         <Label text="Klucz prywatny: a" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <Label text="MOD N:" GridPane.columnIndex="3" GridPane.rowIndex="0" /> <!-- Nowa etykieta dla MOD N -->
         <!-- Key display fields -->
         <TextField fx:id="key1Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
         <TextField fx:id="key2Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         <TextField fx:id="key3Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="modNField" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" /> <!-- Nowe pole dla MOD N -->
         <Button fx:id="generateKeysButton" onAction="#generateKeys" prefHeight="26.0" prefWidth="150.0" text="Generuj klucze" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
     </GridPane>
     <GridPane alignment="CENTER" hgap="10.0" layoutX="30.0" layoutY="177.0" prefHeight="55.0" prefWidth="618.0" vgap="10.0">

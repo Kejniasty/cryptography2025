@@ -106,7 +106,7 @@ public class ElGamalData {
         saveFile(outputFile, unpadded);
     }
 
-    private byte[] serializeCiphertexts(BigInteger[][] ciphertexts) {
+    byte[] serializeCiphertexts(BigInteger[][] ciphertexts) {
         int totalLength = 8;
         for (BigInteger[] ciphertext : ciphertexts) {
             totalLength += 4 + ciphertext[0].toByteArray().length + ciphertext[1].toByteArray().length;
@@ -128,7 +128,7 @@ public class ElGamalData {
         return output;
     }
 
-    private BigInteger[][] deserializeCiphertexts(byte[] input) {
+    BigInteger[][] deserializeCiphertexts(byte[] input) {
         int offset = 0;
         long blockCount = bytesToLong(input, offset);
         offset += 8;
@@ -146,5 +146,8 @@ public class ElGamalData {
             ciphertexts[i][1] = new BigInteger(1, c2Bytes);
         }
         return ciphertexts;
+    }
+    public int getBlockSize() {
+        return 256; // lub inna wartość zgodna z Twoim paddingiem, np. 128, 256 dla ElGamala
     }
 }
