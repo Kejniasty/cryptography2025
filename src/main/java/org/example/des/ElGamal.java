@@ -30,7 +30,7 @@ public class ElGamal {
         // Generuj bezpieczną liczbę pierwszą: p = 2q + 1
         BigInteger q;
         do {
-            q = BigInteger.probablePrime(bitLength, random);
+            q = BigInteger.probablePrime(bitLength + 2, random);
             this.pKey = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
         } while (pKey.isProbablePrime(certainty));
 
@@ -116,7 +116,7 @@ public class ElGamal {
     }
 
     public BigInteger[] encryptBlock(byte[] messageBytes) {
-        if (messageBytes.length > pKey.bitLength() / 8 - 1) {
+        if (messageBytes.length * 8 > pKey.bitLength()) {
             throw new IllegalArgumentException("Blok wiadomości za długi dla klucza");
         }
         BigInteger m = new BigInteger(1, messageBytes);
