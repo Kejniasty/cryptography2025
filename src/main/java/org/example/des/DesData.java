@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Data {
+public class DesData {
     private DES des;           // DES instance for single DES encryption
     private tripleDES tripleDES; // TripleDES instance for 3DES encryption
 
     // Constructor for single DES with one 64-bit key
-    public Data(long key) {
+    public DesData(long key) {
         this.des = new DES(key);
         this.tripleDES = null;
     }
 
     // Constructor for Triple DES with three 64-bit keys
-    public Data(long key1, long key2, long key3) {
+    public DesData(long key1, long key2, long key3) {
         this.des = null;
         this.tripleDES = new tripleDES(key1, key2, key3);
     }

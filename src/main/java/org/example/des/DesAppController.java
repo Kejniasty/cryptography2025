@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 
-public class AppController {
+public class DesAppController {
 
     @FXML
     private TextField key1Field, key2Field, key3Field;

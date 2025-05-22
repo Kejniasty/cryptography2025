@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="508.0" prefWidth="580.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.AppController">
+<VBox alignment="CENTER" prefHeight="508.0" prefWidth="580.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.des.DesAppController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -23,9 +23,9 @@
             <RowConstraints maxHeight="34.8" minHeight="0.0" prefHeight="24.0" vgrow="SOMETIMES" />
         </rowConstraints>
         <!-- Labels for keys -->
-        <Label text="Klucz 1:" GridPane.rowIndex="0" />
-        <Label text="Klucz 2:" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-        <Label text="Klucz 3:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <Label text="Klucz publiczny: g" GridPane.rowIndex="0" />
+        <Label text="Klucz publiczny: h" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label text="Klucz prywatny: a" GridPane.columnIndex="2" GridPane.rowIndex="0" />
         <!-- Key display fields -->
         <TextField fx:id="key1Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" />
         <TextField fx:id="key2Field" prefHeight="26.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />

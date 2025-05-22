@@ -4,28 +4,46 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 public class ElGamal {
-
     private final BigInteger privateKey;
-
-    private BigInteger pKey;
-
-    private BigInteger gKey;
-
-    private BigInteger hKey;
-
+    private BigInteger pKey; // Liczba pierwsza (moduł)
+    private BigInteger gKey; // Generator
+    private BigInteger hKey; // Klucz publiczny: g^privateKey mod p
     private final SecureRandom random = new SecureRandom();
+    private final int certainty = 40; // Pewność testu Millera-Rabina
 
-    public ElGamal(BigInteger privateKey) {
+    public ElGamal(BigInteger privateKey, int bitLength) {
+        if (privateKey.compareTo(BigInteger.ZERO) <= 0) {
+            throw new IllegalArgumentException("Klucz prywatny musi być dodatni");
+        }
         this.privateKey = privateKey;
+        generatePublicKeys(bitLength);
     }
 
     public void generatePublicKeys(int bitLength) {
-        this.pKey = generatePrime(bitLength, 40);
-        this.gKey = new BigInteger(bitLength - 1, random).mod(pKey);
+        if (bitLength < 2048) {
+            throw new IllegalArgumentException("Długość bitowa musi wynosić co najmniej 2048 dla bezpieczeństwa");
+        }
+        // Generuj bezpieczną liczbę pierwszą: p = 2q + 1
+        BigInteger q;
+        do {
+            q = generatePrime(bitLength - 1, certainty);
+            this.pKey = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
+        } while (!isProbablePrime(pKey, certainty));
+
+        // Wybierz generator grupy
+        this.gKey = findGenerator(pKey);
         this.hKey = gKey.modPow(privateKey, pKey);
     }
 
-    // Miller-Rabin-based prime generation
+    private BigInteger findGenerator(BigInteger p) {
+        BigInteger q = p.subtract(BigInteger.ONE).divide(BigInteger.TWO);
+        BigInteger g;
+        do {
+            g = new BigInteger(p.bitLength() - 1, random).mod(p);
+        } while (g.modPow(q, p).equals(BigInteger.ONE) || g.equals(BigInteger.ZERO));
+        return g;
+    }
+
     public BigInteger generatePrime(int bitLength, int certainty) {
         while (true) {
             BigInteger candidate = new BigInteger(bitLength, random).setBit(bitLength - 1).setBit(0);
@@ -35,7 +53,6 @@ public class ElGamal {
         }
     }
 
-    // Miller-Rabin Primality Test
     public boolean isProbablePrime(BigInteger n, int k) {
         if (n.equals(BigInteger.TWO) || n.equals(BigInteger.valueOf(3))) return true;
         if (n.compareTo(BigInteger.TWO) < 0 || n.mod(BigInteger.TWO).equals(BigInteger.ZERO)) return false;
@@ -65,7 +82,6 @@ public class ElGamal {
         return true;
     }
 
-    // Generate a random number in [min, max]
     private BigInteger uniformRandom(BigInteger min, BigInteger max) {
         BigInteger result;
         do {
@@ -74,29 +90,49 @@ public class ElGamal {
         return result;
     }
 
-    // Encrypts a message m < p
     public BigInteger[] encryptBlock(byte[] messageBytes) {
-        BigInteger m = new BigInteger(1, messageBytes); // Convert to BigInteger
-        if (m.compareTo(pKey) >= 0) throw new IllegalArgumentException("Message too long");
-
-        BigInteger y = new BigInteger(pKey.bitLength() - 1, random); // Ephemeral key
+        if (messageBytes.length > pKey.bitLength() / 8 - 1) {
+            throw new IllegalArgumentException("Blok wiadomości za długi dla klucza");
+        }
+        BigInteger m = new BigInteger(1, messageBytes);
+        if (m.compareTo(pKey) >= 0) {
+            throw new IllegalArgumentException("Wiadomość za duża dla modułu");
+        }
+        BigInteger y = new BigInteger(pKey.bitLength() - 1, random);
         BigInteger c1 = gKey.modPow(y, pKey);
         BigInteger s = hKey.modPow(y, pKey);
         BigInteger c2 = m.multiply(s).mod(pKey);
-
         return new BigInteger[]{c1, c2};
     }
 
-    // Decrypts a ciphertext back to the message
     public byte[] decryptBlock(BigInteger c1, BigInteger c2) {
+        if (c1.compareTo(BigInteger.ZERO) <= 0 || c1.compareTo(pKey) >= 0 ||
+                c2.compareTo(BigInteger.ZERO) <= 0 || c2.compareTo(pKey) >= 0) {
+            throw new IllegalArgumentException("Nieprawidłowy szyfrogram");
+        }
         BigInteger s = c1.modPow(privateKey, pKey);
         BigInteger sInv = s.modInverse(pKey);
         BigInteger m = c2.multiply(sInv).mod(pKey);
-        return m.toByteArray(); // Convert back to bytes
+        byte[] result = m.toByteArray();
+        int expectedBlockSize = (pKey.bitLength() / 8) - 1;
+        if (result.length > expectedBlockSize) {
+            if (result[0] == 0) {
+                byte[] trimmed = new byte[result.length - 1];
+                System.arraycopy(result, 1, trimmed, 0, trimmed.length);
+                result = trimmed;
+            } else {
+                throw new IllegalStateException("Zdeszyfrowany blok za duży");
+            }
+        }
+        if (result.length < expectedBlockSize) {
+            byte[] padded = new byte[expectedBlockSize];
+            System.arraycopy(result, 0, padded, expectedBlockSize - result.length, result.length);
+            result = padded;
+        }
+        return result;
     }
 
-    //TODO: Dodać padding do bloków, obsłużyć to imo w klasie Data, do tego zastanowić się czy jakoś tego nie poprawić
-    //TODO: Przeanalizować i ewentualnie zrobić refactor tego pliku (czy takie szyfrowanie jest na pewno najlepsze)
-    //TODO: Ewentualnie poprawić jakieś skrajne przypadki, tzn. głównie m < pKey
-
+    public BigInteger getPKey() { return pKey; }
+    public BigInteger getGKey() { return gKey; }
+    public BigInteger getHKey() { return hKey; }
 }
