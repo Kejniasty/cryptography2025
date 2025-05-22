@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 public class ElGamal {
-    private final BigInteger privateKey;
+    private BigInteger privateKey;
     private BigInteger pKey; // Liczba pierwsza (moduł)
     private BigInteger gKey; // Generator
     private BigInteger hKey; // Klucz publiczny: g^privateKey mod p
@@ -19,6 +19,30 @@ public class ElGamal {
         generatePublicKeys(bitLength);
     }
 
+    public ElGamal(int bitLength) {
+        generateKeys(bitLength);
+    }
+
+    public void generateKeys(int bitLength) {
+        if (bitLength < 2048) {
+            throw new IllegalArgumentException("Długość bitowa musi wynosić co najmniej 2048 dla bezpieczeństwa");
+        }
+        // Generuj bezpieczną liczbę pierwszą: p = 2q + 1
+        BigInteger q;
+        do {
+            q = BigInteger.probablePrime(bitLength, random);
+            this.pKey = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
+        } while (pKey.isProbablePrime(certainty));
+
+        // Wybierz generator grupy
+        this.gKey = findGenerator(pKey);
+        do {
+            this.privateKey = BigInteger.probablePrime(bitLength, this.random);
+        } while (this.privateKey.compareTo(pKey) >= 0);
+
+        this.hKey = gKey.modPow(privateKey, pKey);
+    }
+
     public void generatePublicKeys(int bitLength) {
         if (bitLength < 2048) {
             throw new IllegalArgumentException("Długość bitowa musi wynosić co najmniej 2048 dla bezpieczeństwa");
@@ -26,9 +50,10 @@ public class ElGamal {
         // Generuj bezpieczną liczbę pierwszą: p = 2q + 1
         BigInteger q;
         do {
-            q = generatePrime(bitLength - 1, certainty);
+//            q = generatePrime(bitLength - 1, certainty);
+            q = BigInteger.probablePrime(bitLength, random);
             this.pKey = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
-        } while (!isProbablePrime(pKey, certainty));
+        } while (pKey.isProbablePrime(certainty));
 
         // Wybierz generator grupy
         this.gKey = findGenerator(pKey);
@@ -135,4 +160,5 @@ public class ElGamal {
     public BigInteger getPKey() { return pKey; }
     public BigInteger getGKey() { return gKey; }
     public BigInteger getHKey() { return hKey; }
+    public BigInteger getPrivateKey() { return privateKey; }
 }

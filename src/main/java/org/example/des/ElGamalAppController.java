@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.security.SecureRandom;
+import java.util.Random;
 
 import static java.nio.file.Files.write;
 
@@ -53,9 +55,8 @@ public class ElGamalAppController {
             protected Void call() throws Exception {
                 try {
                     System.out.println("Rozpoczynanie generowania kluczy...");
-                    BigInteger privateKey = new BigInteger(key3Field.getText().isEmpty() ? "12345678901234567890" : key3Field.getText());
-                    System.out.println("Klucz prywatny: " + privateKey.toString(16));
-                    elGamal = new ElGamal(privateKey, 2048); // 2048 bitów
+
+                    elGamal = new ElGamal(2048); // 2048 bitów
                     data = new ElGamalData(elGamal);
                     System.out.println("ElGamal zainicjalizowany");
 
@@ -75,6 +76,13 @@ public class ElGamalAppController {
                             System.out.println("Błąd: getHKey() zwróciło null");
                             showAlert("Błąd", "Metoda getHKey() nie działa poprawnie!");
                         }
+                        if (elGamal.getPrivateKey() != null) {
+                            key3Field.setText(elGamal.getPrivateKey().toString(16)); // h
+                            System.out.println("a: " + elGamal.getPrivateKey().toString(16));
+                        } else {
+                            System.out.println("Błąd: getPrivateKey() zwróciło null");
+                            showAlert("Błąd", "Metoda getPrivateKey() nie działa poprawnie!");
+                        }
                         if (elGamal.getPKey() != null) {
                             modNField.setText(elGamal.getPKey().toString(16)); // p (MOD N)
                             System.out.println("p: " + elGamal.getPKey().toString(16));
@@ -82,8 +90,6 @@ public class ElGamalAppController {
                             System.out.println("Błąd: getPKey() zwróciło null");
                             showAlert("Błąd", "Metoda getPKey() nie działa poprawnie!");
                         }
-                        key3Field.setText(privateKey.toString(16)); // a
-                        System.out.println("a: " + privateKey.toString(16));
                         System.out.println("Klucze wygenerowane pomyślnie");
                     });
                 } catch (NumberFormatException e) {
